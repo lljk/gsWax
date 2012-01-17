@@ -12,8 +12,8 @@ require 'yaml'
 module Settings
 	
 	def self.read		
-		brains_dir = File.dirname(File.expand_path(__FILE__))
-		@settings_file = File.join(brains_dir, "settings", "settings.yml")
+		@brains_dir = File.dirname(File.expand_path(__FILE__))
+		@settings_file = File.join(@brains_dir, "settings", "settings.yml")
 		if File.exists?(@settings_file)
 			@settings = begin
 				YAML.load(File.open(@settings_file))
@@ -38,9 +38,15 @@ module Settings
 	end
 	
 	def self.save
-		File.open(@settings_file, "w"){|file|
-				file.write(@settings.to_yaml)
-		}
+		if File.exists?(@settings_file)
+			File.open(@settings_file, "w"){|file|
+					file.write(@settings.to_yaml)
+			}
+		else
+			@settings_file = File.new(File.join(@brains_dir, "settings", "settings.yml")
+			File.open(@settings_file, "w"){|file|
+					file.write(@settings.to_yaml)
+			}
 	end
 	
 	def self.brains_dir
