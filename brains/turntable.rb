@@ -129,12 +129,12 @@ class Turntable
 	end
 	
 	def draw_arm(w)
-		@cc.destroy if @cc
-		@cc = w.window.create_cairo_context
-		@cc.translate(622.0 * @scale, 149.0 * @scale)
-		@cc.rotate((@arm_pos + 18.25) * Math::PI / 180)
-		@cc.set_source_pixbuf(@arm_pix, -109.0 * @scale, -119.0 * @scale)
-		@cc.paint
+		@acc.destroy if @acc
+		@acc = w.window.create_cairo_context
+		@acc.translate(622.0 * @scale, 149.0 * @scale)
+		@acc.rotate((@arm_pos + 18.25) * Math::PI / 180)
+		@acc.set_source_pixbuf(@arm_pix, -109.0 * @scale, -119.0 * @scale)
+		@acc.paint
 	end
 	
 	def set_arm_pos(percent)
@@ -143,11 +143,11 @@ class Turntable
 	end
 	
 	def draw_slider(w, e)
-		@cc.destroy if @cc
-		@cc = w.window.create_cairo_context
-		@cc.translate(622.0 * @scale, 149.0 * @scale)
-		@cc.set_source_pixbuf(@slider_pix, 16.0 * @scale, ((127.0 * @scale) + @vol_pos))
-		@cc.paint
+		@scc.destroy if @cc
+		@scc = w.window.create_cairo_context
+		@scc.translate(622.0 * @scale, 149.0 * @scale)
+		@scc.set_source_pixbuf(@slider_pix, 16.0 * @scale, ((127.0 * @scale) + @vol_pos))
+		@scc.paint
 	end
 	
 	def move_vol_slider(w, e)
