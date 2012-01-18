@@ -105,8 +105,6 @@ Shoes.app(width: (727 * scl), height: (664 * scl), title: "gsWax") do
 			tracks.each{|e| wax_lineup << e}
 		end
 		
-		
-		
 		if flag
 			batter_up_wax
 			@info_area.set_text("gsWax - ready to rock")
@@ -126,7 +124,7 @@ Shoes.app(width: (727 * scl), height: (664 * scl), title: "gsWax") do
 				okfiles.each{|ok| selected << item if item.downcase =~ ok}
 			}
 		elsif File.exists?(path)
-			selected << path
+			okfiles.each{|ok| selected << path if path.downcase =~ ok}
 		end
 		
 		add_to_list(selected)
@@ -243,7 +241,6 @@ Shoes.app(width: (727 * scl), height: (664 * scl), title: "gsWax") do
 		playpause_wax
 		@table.set_state(wax_state)
 		track_progress
-		p Settings.at_bat#####
 	end
 	
 	def previous_track
