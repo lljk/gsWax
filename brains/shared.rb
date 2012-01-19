@@ -43,10 +43,11 @@ module Settings
 					file.write(@settings.to_yaml)
 			}
 		else
-			@settings_file = File.new(File.join(@brains_dir, "settings", "settings.yml")
+			FileUtils.mkdir_p(File.join(@brains_dir, "settings"))
 			File.open(@settings_file, "w"){|file|
 					file.write(@settings.to_yaml)
 			}
+                end
 	end
 	
 	def self.brains_dir
