@@ -257,7 +257,7 @@ Shoes.app(width: (727 * scl), height: (675 * scl), title: "gsWax") do
 	def seek(percent)
 		if wax_duration
 			sought = wax_duration * percent
-      seek_to_wax((sought * 1000.0).round)
+      			seek_to_wax((sought * 1000.0).round)
 			@table.set_arm_pos(percent)
 		end
 	end
