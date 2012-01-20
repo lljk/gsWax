@@ -38,7 +38,7 @@ Settings.read
 scl = Settings.scale
 
 
-Shoes.app(width: (727 * scl), height: (664 * scl), title: "gsWax") do
+Shoes.app(width: (727 * scl), height: (675 * scl), title: "gsWax") do
 	
 	Shoes::App.class_eval{include Wax}
 	init_wax
@@ -88,6 +88,7 @@ Shoes.app(width: (727 * scl), height: (664 * scl), title: "gsWax") do
 			when "SAVE_LIST"; Settings.playlist_file = message[1]
 			when "LOAD_LIST"; load_playlist(message)
 			when "VOLUME"; set_volume(message[-1])
+			when "SEEK"; seek(message[-1])
 		end
 		
 	end
@@ -208,15 +209,6 @@ Shoes.app(width: (727 * scl), height: (664 * scl), title: "gsWax") do
 		end
 	end
 	
-	def seek
-		if wax_duration
-			percent = (((self.mouse[2] * Settings.scale) - 240) / -55).round(2)
-			sought = wax_duration * percent
-      seek_to_wax((sought * 1000.0).round)
-			@table.set_arm_pos(percent)
-		end
-	end
-	
 	def play_now(track)
 		if wax_lineup.include?(track)
 			self.wax_batter = wax_lineup.index(track) unless Settings.shuffle
@@ -246,11 +238,13 @@ Shoes.app(width: (727 * scl), height: (664 * scl), title: "gsWax") do
 	def previous_track
 		prev_wax
 		@table.update(Settings.at_bat)
+		@table.set_state(wax_state)
 	end
 	
 	def next_track
 		next_wax
 		@table.update(Settings.at_bat)
+		@table.set_state(wax_state)
 	end
 	
 	def set_volume(vol)
@@ -260,28 +254,27 @@ Shoes.app(width: (727 * scl), height: (664 * scl), title: "gsWax") do
 		end
 	end
 	
-	def update_settings
-		@info_area.main.set_size_request(727 * Settings.scale, 75 * Settings.scale) 
-		@info_area.show_text(wax_info)
-		playpause_wax
-		self.win.resize(727 * Settings.scale, 664 * Settings.scale) 
-	  canvas.remove(@table.main)
-		show_table
-		@table.update(Settings.at_bat)
-		canvas.show_all
-		playpause_wax
-		@table.set_state(wax_state)
+	def seek(percent)
+		if wax_duration
+			sought = wax_duration * percent
+      seek_to_wax((sought * 1000.0).round)
+			@table.set_arm_pos(percent)
+		end
 	end
 	
-	def show_table
-		@table = Turntable.new
-		@table.add_observer(self, :on_signals)
-		@table.update(Settings.at_bat)
-		@table.main.signal_connect("destroy"){stop_wax; Settings.save}
-		canvas.put(@table.main, 0, 77 * Settings.scale)
-		nofill; nostroke
-		@seekarea = rect((325 * Settings.scale), (430 * Settings.scale), (150 * Settings.scale), (140 * Settings.scale))
-		@seekarea.click{seek}
+	def update_settings
+		canvas.children.each{|child| canvas.remove(child)}
+		self.win.resize(727 * Settings.scale, 675 * Settings.scale)
+		@info_area.resize
+		@table.resize
+		@table.set_state(wax_state)
+		set_table
+		@info_area.show_text(wax_info)
+	end
+	
+	def set_table
+		canvas.put(@info_area.main, 0, 0)
+		canvas.put(@table.main, 0, 77.0 * Settings.scale)
 	end
 	
 	bga = Settings.bg_color
@@ -289,9 +282,16 @@ Shoes.app(width: (727 * scl), height: (664 * scl), title: "gsWax") do
 	background(bga)
 	
 	@info_area = ScrollBox.new(wax_info)
-	canvas.put(@info_area.main, 0, 0)
+	@table = Turntable.new
+	@table.add_observer(self, :on_signals)
+	@table.update(Settings.at_bat)
+	@table.main.signal_connect("destroy"){
+		stop_wax
+		Settings.line_up = wax_lineup
+		Settings.save
+	}
 	
-	show_table
+	set_table
 	
 	add_observer(self, :on_signals) # (add self as an observer to Wax)
 	

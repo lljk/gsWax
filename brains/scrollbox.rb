@@ -90,8 +90,11 @@ class ScrollBox
 	def set_text(txt)
 		stop_scroll if @scrolling
 		@scroll_text = txt + "   "
-
 		show_text(@scroll_text)
+	end
+	
+	def resize
+		@main.set_size_request(727.0 * Settings.scale, 75.0 * Settings.scale)
 	end
 	
 end

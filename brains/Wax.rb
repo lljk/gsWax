@@ -22,7 +22,6 @@ module Wax
   
   def init_wax
 		Settings.read
-    @wax_lineup = []
     @wax_pipeline = Gst::ElementFactory.make("playbin2")
     @wax_state = "stopped"
     @wax_info = ""
@@ -31,13 +30,9 @@ module Wax
 
   def read_wax_lineup
     @wax_lineup = []
-		if Settings.playlist_file
-			if File.exists?(Settings.playlist_file)
-				list = File.open(Settings.playlist_file, 'r+')
-				list.each{|line| @wax_lineup << line.chomp}
-				list.close
-				@wax_info = "gsWax - ready to rock"
-			end
+		if Settings.line_up
+			@wax_lineup = Settings.line_up
+			@wax_info = "gsWax - ready to rock"
 		else
 			@wax_info = "gsWax"
 			send_wax_info("wax_info")
@@ -246,7 +241,7 @@ module Wax
   #------------------------------------
   
   def seek_to_wax(position_in_ms)
-    if @wax_pipeline# != nil
+    if @wax_pipeline
       @wax_pipeline.send_event(Gst::EventSeek.new(1.0, 
       Gst::Format::Type::TIME, 
       Gst::Seek::FLAG_FLUSH.to_i | Gst::Seek::FLAG_KEY_UNIT.to_i, 
@@ -275,4 +270,4 @@ module Wax
   end
   
 
-end  #module
+end  #module Wax
