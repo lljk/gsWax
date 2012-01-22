@@ -34,6 +34,7 @@ module Settings
 				0.5,
 				nil
 			]
+			FileUtils.mkdir_p(File.join(brains_dir, "settings"))
 			self.save
 		end
 	end
