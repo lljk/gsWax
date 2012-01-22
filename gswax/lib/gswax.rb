@@ -79,7 +79,7 @@ Shoes.app(width: (727 * scl), height: (675 * scl), title: "gsWax") do
 			when "PREVIOUS_TRACK"; previous_track
 			when "NEXT_TRACK"; next_track
 			when "SHUFFLE_TOGGLE"; toggle_wax_shuffle
-			when "PLAYLIST_CLOSED"; @playlist = nil
+			when "PLAYLIST_CLOSED"; @browser.delete_observer(@playlist) if @browser; @playlist = nil
 			when "BROWSER_CLOSED"; @browser = nil
 			when "SETTINGS_CLOSED"; @settings_man = nil
 		end
@@ -156,7 +156,9 @@ Shoes.app(width: (727 * scl), height: (675 * scl), title: "gsWax") do
 	
 	def playlist(list)
 		if @playlist
-			@playlist.close_window; @playlist = nil
+			@browser.delete_observer(@playlist) if @browser
+			@playlist.close_window
+			@playlist = nil
 		else
 			@playlist = PlayList.new; @playlist.add(list)
 			@playlist.add_observer(self, :on_signals)

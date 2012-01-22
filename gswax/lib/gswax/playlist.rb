@@ -9,7 +9,7 @@
 
 class PlayList
 	include Observable
-	attr_accessor :listview
+	attr_accessor :listview, :main
 	
 	def initialize
 		@selected = []
