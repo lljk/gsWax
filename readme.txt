@@ -3,14 +3,9 @@ gsWax 0.12.01 wicked-icked alpha
 
   This thing's not done, but it basically runs at this point, so I thought I'd put it out there.
 
-  You'll need green_shoes (https://github.com/ashbb/green_shoes), and gstreamer (http://rubygems.org/gems/gstreamer) for this business to work.  If you're running Windows, just do the following two steps:
+  The easiest way to install gsWax is to download the gem and install it.  Once installed you can run gsWax by typing `gswax` from a command line.
 
-  - gem install green_shoes
-  - gem install gstreamer
-
-  If you run Linux, you've probably already got the gstreamer library, and you just need the gem - if the library is not installed, you should be able to install it easily through your package manager.
-
-  So, fire up `gsWax.rb` and load up your favorite tracks...
+  So, run the thing, load up your favorite tracks, and rock!
 
   LOADING TRACKS:
   There are a few ways to add tracks - you can drag and drop files or directories onto the main window, open up the directory browser and navigate to files or directories you want to play, or open the playlist and click "add tracks."
