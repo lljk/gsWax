@@ -175,7 +175,7 @@ class SettingsManager
 			
 			page2 = Gtk::VBox.new(false, 2)
 				about_frame = Gtk::Frame.new()
-				about = "gsWax version 0.12.1\nhttps://github.com/lljk/shoeWax/tree/onGreenShoes"
+				about = "gsWax version 0.0.2\nhttps://github.com/lljk/gsWax"
 				about_text = Gtk::Label.new(about)
 				about_text.set_alignment(0.05, 0.5)
 				about_text.set_wrap(true)
