@@ -1,6 +1,6 @@
 =begin
 	
-	this file is part of: gsWax v. 0.12.01
+	this file is part of: gsWax v. 0.0.2
 
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
@@ -9,7 +9,7 @@
 
 class PlayList
 	include Observable
-	attr_accessor :listview, :main
+	attr_accessor :listview
 	
 	def initialize
 		@selected = []
@@ -157,10 +157,10 @@ class PlayList
 	end
 	
 	def save_list
-		unless Dir.exists?((File.join(Settings.brains_dir, "playlists")))
-			Dir.mkdir(File.join(Settings.brains_dir, "playlists"))
+		unless Dir.exists?(File.dirname(File.expand_path(__FILE__)) + "/playlists/")
+			Dir.mkdir(File.dirname(File.expand_path(__FILE__)) + "/playlists/")
 		end
-		Dir.chdir(File.join(Settings.brains_dir, "playlists")){
+		Dir.chdir(File.dirname(File.expand_path(__FILE__)) + "/playlists/"){
 			@savefile = ask_save_file
 		}
 		

@@ -1,6 +1,6 @@
 =begin
 	
-	this file is part of: gsWax v. 0.12.01
+	this file is part of: gsWax v. 0.0.2
 
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
@@ -175,7 +175,7 @@ class SettingsManager
 			
 			page2 = Gtk::VBox.new(false, 2)
 				about_frame = Gtk::Frame.new()
-				about = "gsWax version 0.12.1\nhttps://github.com/lljk/shoeWax/tree/onGreenShoes"
+				about = "gsWax version 0.0.2\nhttps://github.com/lljk/gsWax"
 				about_text = Gtk::Label.new(about)
 				about_text.set_alignment(0.05, 0.5)
 				about_text.set_wrap(true)
@@ -196,7 +196,7 @@ class SettingsManager
 		if Settings.music_dir
 			open_dir = Settings.music_dir if File.exists?(Settings.music_dir)
 		else
-			open_dir = Settings.brains_dir
+			open_dir = File.dirname(File.expand_path(__FILE__))
 		end
 		dialog = Gtk::FileChooserDialog.new(
 			nil,nil,

@@ -8,7 +8,7 @@ Gem::Specification.new do |s|
   s.version     = Gswax::VERSION
   s.authors     = ["j. kaiden"]
   s.email       = ["jakekaiden@gmail.com"]
-  s.homepage    = ""
+  s.homepage    = "https://sites.google.com/site/gswax0/home"
   s.summary     = %q{an audio player for folks who miss their vinyl}
   s.description = %q{an audio player for folks who miss thier vinyl}
 

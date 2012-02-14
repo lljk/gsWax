@@ -1,6 +1,6 @@
 =begin
 	
-	this file is part of: gsWax v. 0.12.01
+	this file is part of: gsWax v. 0.0.2
 
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
@@ -11,9 +11,9 @@ require 'yaml'
 
 module Settings
 	
-	def self.read
-		@brains_dir = File.join(File.dirname(File.expand_path(__FILE__)))
-		@settings_file = File.join(@brains_dir, "settings", "settings.yml")
+	def self.read		
+		brains_dir = File.dirname(File.expand_path(__FILE__))
+		@settings_file = File.join(brains_dir, "settings", "settings.yml")
 		if File.exists?(@settings_file)
 			@settings = begin
 				YAML.load(File.open(@settings_file))
@@ -32,24 +32,21 @@ module Settings
 				[0, 0, 0],
 				nil,
 				0.5,
-				[]
+				nil
 			]
+			FileUtils.mkdir_p(File.join(brains_dir, "settings"))
 			self.save
 		end
 	end
 	
 	def self.save
-		#unless File.exists?(@settings_file)
-		#	Dir.mkdir(File.join(@brains_dir, "settings"), 0777)
-		#	File.new(@settings_file, "w")
-		#end
 		File.open(@settings_file, "w"){|file|
-			file.write(@settings.to_yaml)
+				file.write(@settings.to_yaml)
 		}
 	end
 	
 	def self.brains_dir
-		@brains_dir
+		File.dirname(File.expand_path(__FILE__))
 	end
 	
 	def self.settings

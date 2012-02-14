@@ -1,6 +1,6 @@
 =begin
 	
-	this file is part of: gsWax v. 0.12.01
+	this file is part of: gsWax v. 0.0.2
 
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
@@ -189,7 +189,7 @@ class Turntable
 		cover_file = File.join(Settings.brains_dir, "images", "no_cover.png")
 		cover_size = 485.0 * Settings.scale
 
-		if path
+		if path && File.exists?(path)
 			dir = File.dirname(path)
 			Dir.chdir(dir)
 			files = Dir['*.{jpg,JPG,png,PNG,gif,GIF}']

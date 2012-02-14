@@ -1,6 +1,6 @@
 =begin
 	
-	this file is part of: gsWax v. 0.12.01
+	this file is part of: gsWax v. 0.0.2
 
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
@@ -14,7 +14,7 @@ module Wax
   include Observable
   
   attr_accessor  :wax_coverart, :wax_duration, :wax_state, :wax_pipeline,
-		:wax_batter, :wax_lineup, :wax_lupine, :wax_info
+		:wax_batter, :wax_lineup, :wax_lupine, :wax_info, :wax_tracking
   
   #----------------------
   #  INITIALIZE
@@ -30,7 +30,7 @@ module Wax
 
   def read_wax_lineup
     @wax_lineup = []
-		unless Settings.line_up.empty?
+		if Settings.line_up
 			@wax_lineup = Settings.line_up
 			@wax_info = "gsWax - ready to rock"
 		else
@@ -76,32 +76,37 @@ module Wax
     if @wax_lineup.empty?
       batter_up_wax
     end
+		if @stream_thread; @stream_thread.exit; @stream_thread = nil; end
     if Settings.at_bat
-      if File.exists?(Settings.at_bat)
+			if Settings.at_bat =~ /http:/
+				@wax_pipeline.uri = Settings.at_bat
+				@wax_tracking = false
+        @wax_state = "playing"
+				@wax_info = "Stream: #{Settings.at_bat}"
+				send_wax_info("wax_info")
+				@stream_thread = Thread.new{@wax_pipeline.play}
+      elsif File.exists?(Settings.at_bat)
         @wax_pipeline.uri= GLib.filename_to_uri(Settings.at_bat)
-        bus = @wax_pipeline.bus
-        @tagMsg = []
-        
-        bus.add_watch {|bus, message|
-          case message.type
-            when Gst::Message::ERROR
-              p message.parse
-            when Gst::Message::EOS
-              @wax_state = "stopped"
-              next_wax
-              send_wax_info("eos")
-            when Gst::Message::TAG
-              @tagMsg << message.structure.entries
-              get_wax_tags
-          end
-          true
-        }
-        
+				@wax_tracking = true
         @wax_pipeline.play
         @wax_state = "playing"
         get_wax_duration
       end
-    
+			@tagMsg = []
+			@wax_pipeline.bus.add_watch{|bus, message|
+				case message.type
+					when Gst::Message::ERROR
+						p message.parse
+					when Gst::Message::EOS
+						@wax_state = "stopped"
+						next_wax
+						send_wax_info("eos")
+					when Gst::Message::TAG
+						@tagMsg << message.structure.entries
+						get_wax_tags
+				end
+				true
+			}
     else
       @wax_info = "no tracks"
       send_wax_info("wax_info")
@@ -177,7 +182,6 @@ module Wax
       @wax_info = @infoentries.join
       send_wax_info("wax_info")
     end
-    
   end #get_wax_tags
   
   
@@ -185,7 +189,7 @@ module Wax
   #  TRANSPORT
   #-----------------------
   
-  def playpause_wax
+  def play_pause_wax
     if Settings.at_bat
       if @wax_state == "stopped"
         play_wax
@@ -254,20 +258,5 @@ module Wax
     changed
     notify_observers(info)
   end
-  
-  def xsave_wax_settings(settings)
-    settings[0] = @wax_roster
-    if  @wax_shuffle == true
-      settings[1] = "shuffle on"
-    else
-      settings[1] = "shuffle off"
-    end
-    settings[2] = Settings.at_bat
-  
-    File.open(@settings_file, "w"){|file|
-      settings.each{|entry| file.puts(entry)}
-    }
-  end
-  
 
 end  #module Wax

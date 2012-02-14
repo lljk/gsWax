@@ -1,6 +1,6 @@
 =begin
 	
-	this file is part of: gsWax v. 0.12.01
+	this file is part of: gsWax v. 0.0.2
 
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
@@ -10,7 +10,7 @@
 class DirBrowser
 	include Observable
 	
-	def initialize(path = Settings.brains_dir)		
+	def initialize(path = File.expand_path(File.dirname(__FILE__)))
 		@okfiles = [/.mp3/, /.flac/, /.ogg/, /.wav/]
 		@selected = []
 		@listview = ListView.new		# def in shared.rb
@@ -132,12 +132,35 @@ class DirBrowser
 			dirs << iter[1] ? File.directory?(iter[1]) : files << iter[1]
 		}
 		
-		files.each{|file| @selected << file} if files[0]		
+		if files[0]
+			files.each{|path|
+				if File.extname(path.downcase) == ".pls" or File.extname(path.downcase) == ".m3u"
+					File.open(path){|file|
+						file.each_line{|line|
+							if line.include?("http:")
+								@selected << /http.+/.match(line).to_s
+							end
+						}
+					}
+				else
+					@selected << path
+				end
+			}
+		end
 		
 		if dirs[0]
 			dirs.each{|dir| 
 				Find.find(dir){|item|
-				@okfiles.each{|ok| @selected << item if item.downcase =~ ok}
+					@okfiles.each{|ok| @selected << item if File.extname(item.downcase) =~ ok}
+					if File.extname(item.downcase) == ".pls" or File.extname(item.downcase) == ".m3u"
+						File.open(item){|file|
+							file.each_line{|line|
+								if line.include?("http:")
+									@selected << /http.+/.match(line).to_s
+								end
+							}
+						}
+					end
 				}	
 			}
 		end
@@ -168,7 +191,7 @@ class DirBrowser
 							if File.directory?(item)
 								dirs << item unless File.basename(item)[0] == "."
 							else
-								@okfiles.each{|ok| files << item if item.downcase =~ ok}
+								@okfiles.each{|ok| files << item if File.extname(item.downcase) =~ ok}
 							end
 						end
 					end
