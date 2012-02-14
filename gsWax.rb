@@ -3,7 +3,7 @@
 =begin
 
     gsWax
-    v 0.12.01
+    v 0.0.2
     
      an audio player for folks who miss their vinyl
 

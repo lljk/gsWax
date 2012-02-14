@@ -1,5 +1,5 @@
 
-gsWax 0.12.01 wicked-icked alpha
+gsWax 0.0.2 wicked-icked alpha
 
   This thing's not done, but it basically runs at this point, so I thought I'd put it out there.
 
