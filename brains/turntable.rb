@@ -189,7 +189,7 @@ class Turntable
 		cover_file = File.join(Settings.brains_dir, "images", "no_cover.png")
 		cover_size = 485.0 * Settings.scale
 
-		if path
+		if path && File.exists?(path)
 			dir = File.dirname(path)
 			Dir.chdir(dir)
 			files = Dir['*.{jpg,JPG,png,PNG,gif,GIF}']

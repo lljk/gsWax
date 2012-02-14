@@ -1,3 +1,5 @@
+#! /usr/bin/env ruby
+
 =begin
 
     gsWax
@@ -102,8 +104,10 @@ Shoes.app(width: (727 * scl), height: (675 * scl), title: "gsWax") do
 		
 		if pos == "prepend"
 			tracks.reverse.each{|e| wax_lineup.insert(0, e)}
+			tracks.shuffle.each{|e| wax_lupine.insert(0, e)}
 		else
 			tracks.each{|e| wax_lineup << e}
+			tracks.shuffle.each{|e| wax_lupine << e}
 		end
 		
 		if flag
@@ -116,18 +120,32 @@ Shoes.app(width: (727 * scl), height: (675 * scl), title: "gsWax") do
 	def data_drop(data, context)
 		raw = CGI.unescape(data)
 		arr = raw.chomp.split("file:#{File::Separator}#{File::Separator}")
-		path = arr[-1]
 		okfiles = [/.mp3/, /.flac/, /.ogg/, /.wav/]
 		selected = []
-
-		if File.directory?(path)
-			Find.find(path){|item|
-				okfiles.each{|ok| selected << item if item.downcase =~ ok}
-			}
-		elsif File.exists?(path)
-			okfiles.each{|ok| selected << path if path.downcase =~ ok}
-		end
 		
+		arr.each{|path|
+			path.chomp!
+			if File.directory?(path)
+				Find.find(path){|item|
+					okfiles.each{|ok| selected << item if File.extname(item.downcase) =~ ok}
+				}
+			elsif File.file?(path)
+				ext  = File.extname(path.downcase)
+				okfiles.each{|ok| selected << path if ext =~ ok}
+				if ext == ".pls" or ext == ".m3u"
+					File.open(path){|file|
+						file.each_line{|line|
+							if line.include?("http:")
+								selected << /http.+/.match(line).to_s
+								#m = /http.+/.match(line).to_s
+								#p m
+							end
+						}
+					}
+				end
+			end
+		}
+
 		add_to_list(selected)
 		@playlist.add(selected) if @playlist
 
@@ -165,7 +183,10 @@ Shoes.app(width: (727 * scl), height: (675 * scl), title: "gsWax") do
 		stop_wax if wax_state != "stopped"
 		f_name = message[1]
 		Settings.playlist_file = f_name
-		self.wax_batter = 0
+		#self.wax_batter = 0
+		Settings.line_up.clear
+		tracks = message[2..-1]
+		tracks.each{|track| Settings.line_up << track}
 		read_wax_lineup
 		@table.update(Settings.at_bat)
 		@info_area.set_text("gsWax - ready to rock")
@@ -193,14 +214,16 @@ Shoes.app(width: (727 * scl), height: (675 * scl), title: "gsWax") do
 	
 	def track_progress
 		unless @tracking
-			GLib::Timeout.add(100){
+			timeout = GLib::Timeout.add(100){
 				if wax_state == "playing"
-					pos_query = Gst::QueryPosition.new(3)#(Gst::Format::Time)
-					wax_pipeline.query(pos_query)
-					track_pos = pos_query.parse[1] / 10000.0
-					arm_pos =(((track_pos * 1.0) / wax_duration) / 1000.0).round(1)
-					@table.set_arm_pos(arm_pos)
-					@tracking = true
+					if wax_tracking
+						pos_query = Gst::QueryPosition.new(3)
+						wax_pipeline.query(pos_query)
+						track_pos = pos_query.parse[1] / 10000.0
+						arm_pos =(((track_pos * 1.0) / wax_duration) / 1000.0).round(1)
+						@table.set_arm_pos(arm_pos)
+						@tracking = true
+					end
 				else
 					@tracking = false
 					false
@@ -219,7 +242,7 @@ Shoes.app(width: (727 * scl), height: (675 * scl), title: "gsWax") do
 			if wax_lineup.empty?
 				wax_lineup << track
 				batter_up_wax
-				playpause_track
+				play_pause_track
 			else
 				wax_lineup.insert(wax_batter + 1, track) unless Settings.shuffle
 				wax_lupine.insert(wax_batter + 1, track) if Settings.shuffle
@@ -230,9 +253,9 @@ Shoes.app(width: (727 * scl), height: (675 * scl), title: "gsWax") do
 	end
 	
 	def play_pause_track
-		playpause_wax
+		play_pause_wax
 		@table.set_state(wax_state)
-		track_progress
+		track_progress# if wax_tracking
 	end
 	
 	def previous_track
@@ -257,7 +280,7 @@ Shoes.app(width: (727 * scl), height: (675 * scl), title: "gsWax") do
 	def seek(percent)
 		if wax_duration
 			sought = wax_duration * percent
-      seek_to_wax((sought * 1000.0).round)
+      			seek_to_wax((sought * 1000.0).round)
 			@table.set_arm_pos(percent)
 		end
 	end

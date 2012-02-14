@@ -14,7 +14,7 @@ module Wax
   include Observable
   
   attr_accessor  :wax_coverart, :wax_duration, :wax_state, :wax_pipeline,
-		:wax_batter, :wax_lineup, :wax_lupine, :wax_info
+		:wax_batter, :wax_lineup, :wax_lupine, :wax_info, :wax_tracking
   
   #----------------------
   #  INITIALIZE
@@ -76,32 +76,37 @@ module Wax
     if @wax_lineup.empty?
       batter_up_wax
     end
+		if @stream_thread; @stream_thread.exit; @stream_thread = nil; end
     if Settings.at_bat
-      if File.exists?(Settings.at_bat)
+			if Settings.at_bat =~ /http:/
+				@wax_pipeline.uri = Settings.at_bat
+				@wax_tracking = false
+        @wax_state = "playing"
+				@wax_info = "Stream: #{Settings.at_bat}"
+				send_wax_info("wax_info")
+				@stream_thread = Thread.new{@wax_pipeline.play}
+      elsif File.exists?(Settings.at_bat)
         @wax_pipeline.uri= GLib.filename_to_uri(Settings.at_bat)
-        bus = @wax_pipeline.bus
-        @tagMsg = []
-        
-        bus.add_watch {|bus, message|
-          case message.type
-            when Gst::Message::ERROR
-              p message.parse
-            when Gst::Message::EOS
-              @wax_state = "stopped"
-              next_wax
-              send_wax_info("eos")
-            when Gst::Message::TAG
-              @tagMsg << message.structure.entries
-              get_wax_tags
-          end
-          true
-        }
-        
+				@wax_tracking = true
         @wax_pipeline.play
         @wax_state = "playing"
         get_wax_duration
       end
-    
+			@tagMsg = []
+			@wax_pipeline.bus.add_watch{|bus, message|
+				case message.type
+					when Gst::Message::ERROR
+						p message.parse
+					when Gst::Message::EOS
+						@wax_state = "stopped"
+						next_wax
+						send_wax_info("eos")
+					when Gst::Message::TAG
+						@tagMsg << message.structure.entries
+						get_wax_tags
+				end
+				true
+			}
     else
       @wax_info = "no tracks"
       send_wax_info("wax_info")
@@ -177,7 +182,6 @@ module Wax
       @wax_info = @infoentries.join
       send_wax_info("wax_info")
     end
-    
   end #get_wax_tags
   
   
@@ -185,7 +189,7 @@ module Wax
   #  TRANSPORT
   #-----------------------
   
-  def playpause_wax
+  def play_pause_wax
     if Settings.at_bat
       if @wax_state == "stopped"
         play_wax
