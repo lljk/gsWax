@@ -137,8 +137,6 @@ Shoes.app(width: (727 * scl), height: (675 * scl), title: "gsWax") do
 						file.each_line{|line|
 							if line.include?("http:")
 								selected << /http.+/.match(line).to_s
-								#m = /http.+/.match(line).to_s
-								#p m
 							end
 						}
 					}
@@ -183,7 +181,6 @@ Shoes.app(width: (727 * scl), height: (675 * scl), title: "gsWax") do
 		stop_wax if wax_state != "stopped"
 		f_name = message[1]
 		Settings.playlist_file = f_name
-		#self.wax_batter = 0
 		Settings.line_up.clear
 		tracks = message[2..-1]
 		tracks.each{|track| Settings.line_up << track}
@@ -255,7 +252,7 @@ Shoes.app(width: (727 * scl), height: (675 * scl), title: "gsWax") do
 	def play_pause_track
 		play_pause_wax
 		@table.set_state(wax_state)
-		track_progress# if wax_tracking
+		track_progress
 	end
 	
 	def previous_track

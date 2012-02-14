@@ -258,20 +258,5 @@ module Wax
     changed
     notify_observers(info)
   end
-  
-  def xsave_wax_settings(settings)
-    settings[0] = @wax_roster
-    if  @wax_shuffle == true
-      settings[1] = "shuffle on"
-    else
-      settings[1] = "shuffle off"
-    end
-    settings[2] = Settings.at_bat
-  
-    File.open(@settings_file, "w"){|file|
-      settings.each{|entry| file.puts(entry)}
-    }
-  end
-  
 
 end  #module Wax

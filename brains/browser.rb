@@ -138,7 +138,7 @@ class DirBrowser
 					File.open(path){|file|
 						file.each_line{|line|
 							if line.include?("http:")
-								@selected << /http.+/.match(line).to_s####
+								@selected << /http.+/.match(line).to_s
 							end
 						}
 					}
@@ -156,7 +156,7 @@ class DirBrowser
 						File.open(item){|file|
 							file.each_line{|line|
 								if line.include?("http:")
-									@selected << /http.+/.match(line).to_s####
+									@selected << /http.+/.match(line).to_s
 								end
 							}
 						}
